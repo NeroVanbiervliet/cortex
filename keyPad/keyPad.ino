@@ -9,6 +9,11 @@ int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
 unsigned long lastKeyPress;
 int lastDigit; // last registered digit of keypad
 
+// keypad code
+int keypadCodeTruth[4] = {1,4,7,4};
+int keypadCodeAttempt[4];
+int codeIndex = 0;
+
 void setup() {
   pinMode(KEYPAD_SUPPLY, OUTPUT);
   digitalWrite(KEYPAD_SUPPLY, HIGH); 
@@ -41,12 +46,33 @@ void keypadIsr() {
 
 // if deboucing passes, register the last digit
 void registerLastDigit() {
-  // NEED verwerk digit (toevoegen aan codeTry) 
+  keypadCodeAttempt[codeIndex] = lastDigit; 
+  codeIndex++;
+  soundKeypadPress();
+
+  // check code
+  if (codeIndex == 4) {
+    codeIndex = 0;
+    if (checkKeyPadCode()) Serial.println("Good code"); 
+    else Serial.println("Bad code"); 
+  }
   Serial.println(lastDigit); 
+}
+
+// check if the attempted keypad code is correct
+bool checkKeyPadCode() {
+  bool match = true;
+  for (int i=0; i<4; i++) {
+    match = match && (keypadCodeAttempt[i] == keypadCodeTruth[i]);
+  }
+  return match;
 }
 
 // reads the keypad
 void readKeypad() {
+  // give voltage time to rise, interrupt is already triggered @9V
+  delayMicroseconds(100); 
+  
   // check what column caused interrupt
   for(int column=0; column<3; column++) {
     float voltage = analogRead(KEYPAD_COLUMN_PINS[column]); 
@@ -72,4 +98,7 @@ int indicesToDigit(int row, int column) {
   return (row*3) + column + 1; 
 }
 
+void soundKeypadPress() {
+   Serial.println("BLEEP"); // NEED
+}
 
