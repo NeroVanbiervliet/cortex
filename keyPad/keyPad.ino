@@ -30,8 +30,12 @@ void setup() {
     pinMode(KEYPAD_COLUMN_PINS[i], INPUT); 
   }
 
+  // pc serial for debugging
   Serial.begin(9600); 
   Serial.println("serial established"); 
+
+  // mp3 serial
+  Serial2.begin(38400); 
 }
 
 
@@ -106,14 +110,17 @@ void makeSound(int sound) {
   switch (sound) {
     case SND_KEY_PRESS:
     Serial.println("BLEEP"); // NEED
+    Serial2.println("T2"); // mp3 trigger command
     break;
     
     case SND_GOOD_CODE:
     Serial.println("GOOD CODE"); // NEED
+    Serial2.println("T5"); 
     break;
 
     case SND_BAD_CODE:
     Serial.println("BAD CODE"); // NEED
+    Serial2.println("T3"); 
   }
 }
 
