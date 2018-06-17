@@ -1,9 +1,18 @@
 #include <Controllino.h> 
 
+// keypad constants
 #define KEYPAD_SUPPLY CONTROLLINO_D0
 #define KEYPAD_INT CONTROLLINO_IN0
 #define KEYPAD_DEBOUNCING_TIME 50 // [milliseconds]
 int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
+
+// sound constants
+#define SND_KEY_PRESS 0
+#define SND_BAD_CODE 1
+#define SND_GOOD_CODE 2
+
+// other constants
+#define RELAIS_ALARM_LIGHT CONTROLLINO_R2
 
 // debouncing
 unsigned long lastKeyPress;
@@ -14,21 +23,21 @@ int keypadCodeTruth[4] = {1,4,7,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
 
-// sounds
-#define SND_KEY_PRESS 0
-#define SND_BAD_CODE 1
-#define SND_GOOD_CODE 2
-
 void setup() {
+  // pinmodes
   pinMode(KEYPAD_SUPPLY, OUTPUT);
-  digitalWrite(KEYPAD_SUPPLY, HIGH); 
-  
-  pinMode(KEYPAD_INT, INPUT); 
-  attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
-
+  pinMode(KEYPAD_INT, INPUT);
   for (int i=0; i<3; i++) {
     pinMode(KEYPAD_COLUMN_PINS[i], INPUT); 
   }
+  pinMode(RELAIS_ALARM_LIGHT, OUTPUT); 
+
+  // default states of outputs 
+  digitalWrite(KEYPAD_SUPPLY, HIGH); 
+  digitalWrite(RELAIS_ALARM_LIGHT, LOW);  
+
+  // interrupts
+  attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
 
   // pc serial for debugging
   Serial.begin(9600); 
@@ -109,18 +118,15 @@ int indicesToDigit(int row, int column) {
 void makeSound(int sound) {
   switch (sound) {
     case SND_KEY_PRESS:
-    Serial.println("BLEEP"); // NEED
     Serial2.println("T2"); // mp3 trigger command
     break;
     
     case SND_GOOD_CODE:
-    Serial.println("GOOD CODE"); // NEED
     Serial2.println("T5"); 
     break;
 
     case SND_BAD_CODE:
-    Serial.println("BAD CODE"); // NEED
-    Serial2.println("T3"); 
+    Serial2.println("T3");   
   }
 }
 
