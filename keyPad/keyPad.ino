@@ -14,6 +14,11 @@ int keypadCodeTruth[4] = {1,4,7,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
 
+// sounds
+#define SND_KEY_PRESS 0
+#define SND_BAD_CODE 1
+#define SND_GOOD_CODE 2
+
 void setup() {
   pinMode(KEYPAD_SUPPLY, OUTPUT);
   digitalWrite(KEYPAD_SUPPLY, HIGH); 
@@ -48,15 +53,14 @@ void keypadIsr() {
 void registerLastDigit() {
   keypadCodeAttempt[codeIndex] = lastDigit; 
   codeIndex++;
-  soundKeypadPress();
+  makeSound(SND_KEY_PRESS);
 
   // check code
   if (codeIndex == 4) {
     codeIndex = 0;
-    if (checkKeyPadCode()) Serial.println("Good code"); 
-    else Serial.println("Bad code"); 
+    if (checkKeyPadCode()) makeSound(SND_GOOD_CODE); 
+    else makeSound(SND_BAD_CODE); 
   }
-  Serial.println(lastDigit); 
 }
 
 // check if the attempted keypad code is correct
@@ -98,7 +102,18 @@ int indicesToDigit(int row, int column) {
   return (row*3) + column + 1; 
 }
 
-void soundKeypadPress() {
-   Serial.println("BLEEP"); // NEED
+void makeSound(int sound) {
+  switch (sound) {
+    case SND_KEY_PRESS:
+    Serial.println("BLEEP"); // NEED
+    break;
+    
+    case SND_GOOD_CODE:
+    Serial.println("GOOD CODE"); // NEED
+    break;
+
+    case SND_BAD_CODE:
+    Serial.println("BAD CODE"); // NEED
+  }
 }
 
