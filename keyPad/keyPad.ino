@@ -1,4 +1,16 @@
+#include <TimerOne.h>
 #include <Controllino.h> 
+
+// timing constants [seconds]
+#define TIME_SMOKE_ON 10
+#define TIME_WAIT 30
+
+// state constants
+#define STATE_INIT 0
+#define STATE_ACTIVE 1
+#define STATE_PLAY_AUDIO 2
+#define STATE_SMOKE 3
+#define STATE_WAIT 4
 
 // keypad constants
 #define KEYPAD_SUPPLY CONTROLLINO_D0
@@ -10,18 +22,28 @@ int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
 #define SND_KEY_PRESS 0
 #define SND_BAD_CODE 1
 #define SND_GOOD_CODE 2
+#define SND_ALARM 3
 
 // other constants
-#define RELAIS_ALARM_LIGHT CONTROLLINO_R2
+#define SUPPLY_ALARM_LIGHT CONTROLLINO_D11 // red flashing light
+#define RELAIS_SMOKE CONTROLLINO_R8
+#define RELAIS_LASERS CONTROLLINO_R9
 
 // debouncing
 unsigned long lastKeyPress;
 int lastDigit; // last registered digit of keypad
 
+// state management
+int state = STATE_INIT; // default state before correct keypad code is entered
+bool firstActivation = true; 
+
 // keypad code
 int keypadCodeTruth[4] = {1,4,7,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
+
+// timer
+int timerRemainingCount; // remaining seconds in timer
 
 void setup() {
   // pinmodes
@@ -30,14 +52,23 @@ void setup() {
   for (int i=0; i<3; i++) {
     pinMode(KEYPAD_COLUMN_PINS[i], INPUT); 
   }
-  pinMode(RELAIS_ALARM_LIGHT, OUTPUT); 
+  pinMode(SUPPLY_ALARM_LIGHT, OUTPUT); 
+  pinMode(RELAIS_LASERS, OUTPUT); 
+  pinMode(RELAIS_SMOKE, OUTPUT); 
 
   // default states of outputs 
   digitalWrite(KEYPAD_SUPPLY, HIGH); 
-  digitalWrite(RELAIS_ALARM_LIGHT, LOW);  
+  digitalWrite(SUPPLY_ALARM_LIGHT, LOW);  
+  digitalWrite(RELAIS_LASERS, LOW); 
+  digitalWrite(RELAIS_SMOKE, LOW); 
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
+
+  // timer, cannot be initialised outside setup()!
+  Timer1.initialize(1000000); // 1 second period
+  Timer1.attachInterrupt(timerIsr); 
+  Timer1.stop(); 
 
   // pc serial for debugging
   Serial.begin(9600); 
@@ -48,8 +79,7 @@ void setup() {
 }
 
 
-void loop() {
-}
+void loop() {} // empty
 
 void keypadIsr() {
   if (digitalRead(KEYPAD_INT) == HIGH) {
@@ -59,7 +89,6 @@ void keypadIsr() {
   else {
     if (millis() - lastKeyPress > KEYPAD_DEBOUNCING_TIME) registerLastDigit();
   }
-
 }
 
 // if deboucing passes, register the last digit
@@ -71,7 +100,7 @@ void registerLastDigit() {
   // check code
   if (codeIndex == 4) {
     codeIndex = 0;
-    if (checkKeyPadCode()) makeSound(SND_GOOD_CODE); 
+    if (checkKeyPadCode()) { makeSound(SND_GOOD_CODE); nextState(); }
     else makeSound(SND_BAD_CODE); 
   }
 }
@@ -126,7 +155,68 @@ void makeSound(int sound) {
     break;
 
     case SND_BAD_CODE:
-    Serial2.println("T3");   
+    Serial2.println("T3"); 
+    break;  
+
+    case SND_ALARM:
+    Serial2.println("T4"); 
+    break;
+  }
+}
+
+// implements state diagram
+void nextState() {
+  int nextState; // next state to be set
+  if (state == STATE_INIT) nextState = STATE_ACTIVE; 
+  if (state == STATE_ACTIVE && !firstActivation) nextState = STATE_SMOKE;
+  if (state == STATE_ACTIVE && firstActivation) { nextState = STATE_PLAY_AUDIO; firstActivation = false; }
+  if (state == STATE_PLAY_AUDIO) nextState = STATE_SMOKE; 
+  if (state == STATE_SMOKE) nextState = STATE_WAIT; 
+  if (state == STATE_WAIT) nextState = STATE_INIT; 
+  Serial.println("state: " + String(nextState)); 
+  state = nextState; 
+  performState(); 
+}
+
+// performs state actions
+void performState() {
+  switch (state) {
+    case STATE_ACTIVE:
+    digitalWrite(RELAIS_LASERS, HIGH); 
+    digitalWrite(SUPPLY_ALARM_LIGHT, HIGH); 
+    nextState(); 
+    break;
+    
+    case STATE_PLAY_AUDIO:
+    makeSound(SND_ALARM); 
+    nextState(); 
+    break; 
+
+    case STATE_SMOKE:
+    digitalWrite(RELAIS_SMOKE, HIGH); 
+    launchStateTimer(TIME_SMOKE_ON); 
+    break; 
+
+    case STATE_WAIT:
+    digitalWrite(RELAIS_SMOKE, LOW); 
+    launchStateTimer(TIME_WAIT); 
+    break;
+  }
+}
+
+// launch timer until next state
+void launchStateTimer(int seconds) {
+  timerRemainingCount = seconds; 
+  Timer1.start(); 
+}
+
+// timer interrupt subrouting
+void timerIsr() {
+  timerRemainingCount--; 
+  Serial.println("remcount: " + String(timerRemainingCount)); 
+  if (timerRemainingCount <= 0) {
+    Timer1.stop(); 
+    nextState(); 
   }
 }
 
