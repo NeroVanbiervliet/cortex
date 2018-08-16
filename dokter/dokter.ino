@@ -19,10 +19,10 @@
 int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
 
 // sound constants
-#define SND_KEY_PRESS 0
-#define SND_BAD_CODE 1
-#define SND_GOOD_CODE 2
-#define SND_ALARM 3
+#define SND_KEY_PRESS "T2"
+#define SND_BAD_CODE "T3"
+#define SND_GOOD_CODE "T5"
+#define SND_ALARM "T4"
 
 // other constants
 #define SUPPLY_ALARM_LIGHT CONTROLLINO_D11 // red flashing light
@@ -144,24 +144,8 @@ int indicesToDigit(int row, int column) {
   return (row*3) + column + 1; 
 }
 
-void makeSound(int sound) {
-  switch (sound) {
-    case SND_KEY_PRESS:
-    Serial2.println("T2"); // mp3 trigger command
-    break;
-    
-    case SND_GOOD_CODE:
-    Serial2.println("T5"); 
-    break;
-
-    case SND_BAD_CODE:
-    Serial2.println("T3"); 
-    break;  
-
-    case SND_ALARM:
-    Serial2.println("T4"); 
-    break;
-  }
+void makeSound(String sound) {
+  Serial2.println(sound); // mp3 trigger command
 }
 
 // implements state diagram
