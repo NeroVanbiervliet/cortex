@@ -141,6 +141,7 @@ void nextState() {
   if (state == STATE_PLAY_AUDIO) nextState = STATE_SMOKE; 
   if (state == STATE_SMOKE) nextState = STATE_WAIT; 
   if (state == STATE_WAIT) nextState = STATE_INIT; 
+  
   Serial.println("state: " + String(nextState)); 
   state = nextState; 
   performState(); 
