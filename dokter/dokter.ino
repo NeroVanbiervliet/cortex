@@ -42,9 +42,6 @@ int keypadCodeTruth[4] = {1,4,7,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
 
-// timer
-int timerRemainingCount; // remaining seconds in timer
-
 void setup() {
   // pinmodes
   pinMode(KEYPAD_SUPPLY, OUTPUT);
@@ -65,17 +62,8 @@ void setup() {
   // interrupts
   attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
 
-  // timer, cannot be initialised outside setup()!
-  Timer1.initialize(1000000); // 1 second period
-  Timer1.attachInterrupt(timerIsr); 
-  Timer1.stop(); 
-
-  // pc serial for debugging
-  Serial.begin(9600); 
-  Serial.println("serial established"); 
-
-  // mp3 serial
-  Serial2.begin(38400); 
+  // setup needed for common file
+  commonSetup(); 
 }
 
 
@@ -144,10 +132,6 @@ int indicesToDigit(int row, int column) {
   return (row*3) + column + 1; 
 }
 
-void makeSound(String sound) {
-  Serial2.println(sound); // mp3 trigger command
-}
-
 // implements state diagram
 void nextState() {
   int nextState; // next state to be set
@@ -188,19 +172,5 @@ void performState() {
   }
 }
 
-// launch timer until next state
-void launchStateTimer(int seconds) {
-  timerRemainingCount = seconds; 
-  Timer1.start(); 
-}
 
-// timer interrupt subrouting
-void timerIsr() {
-  timerRemainingCount--; 
-  Serial.println("remcount: " + String(timerRemainingCount)); 
-  if (timerRemainingCount <= 0) {
-    Timer1.stop(); 
-    nextState(); 
-  }
-}
 
