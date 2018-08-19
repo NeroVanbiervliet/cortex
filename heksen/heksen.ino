@@ -58,9 +58,12 @@ void setup() {
   // setup needed for common file and scale file
   commonSetup(); 
   scaleSetup(); 
+  ethernetSetup();
 }
 
-void loop() {} // empty
+void loop() {
+  listenOnEthernet(); // NEED delay nodig?
+}
 
 void buttonIsr() {
   if (digitalRead(BUTTON_INT) == HIGH) {
@@ -87,7 +90,7 @@ void nextState() {
   int nextState; // next state to be set
   if (state == STATE_INIT) nextState = STATE_UNLOCK_DOOR; 
   if (state == STATE_UNLOCK_DOOR) nextState = STATE_WEIGH_KETTLE; 
-  if (state == STATE_WEIGH_KETTLE && !isCorrectWeight() nextState = STATE_WEIGH_KETTLE; 
+  if (state == STATE_WEIGH_KETTLE && !isCorrectWeight()) nextState = STATE_WEIGH_KETTLE; 
   if (state == STATE_WEIGH_KETTLE && isCorrectWeight()) nextState = STATE_UNLOCK_COMPARTMENT; 
   if (state == STATE_UNLOCK_COMPARTMENT) nextState = STATE_VICTORY; 
   
@@ -120,5 +123,11 @@ void performState() {
     // NEED strobe
     break; 
   }
+}
+
+// handles ethernet api request
+void handleApiRequest(String apiPath) {
+  Serial.println("api request received at path: " + apiPath); 
+  // NEED implementation
 }
 
