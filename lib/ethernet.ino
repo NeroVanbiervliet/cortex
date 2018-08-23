@@ -9,8 +9,9 @@ int charCounter = 0; // counts how many characters of API_URL are already matche
 bool apiUrlMatch = false; // true if API_URL has been matched
 
 // mac address WARNING must be different for each controllino
+// @mac_address@ will be replaced by aap build process (see readme)
 byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+  @mac_address@ // e.g. 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
 };
 
 // server at port 80

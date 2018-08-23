@@ -1,0 +1,20 @@
+# constants
+DIR_DOKTER = dokter
+DIR_HEKSEN = heksen
+DIR_JAGERS = jagers
+
+# syntax = target : list-of-dependencies
+# merely copies the common.ino file
+$DIR_DOKTER/common.lib.ino : lib/common.ino
+	:cat $source  >! $target
+
+# TODO same as previous command, how to set multiple targets?
+$DIR_HEKSEN/common.lib.ino : lib/common.ino
+	:cat $source >! $target
+
+# copies and replaces mac address
+$DIR_HEKSEN/ethernet.lib.ino : lib/ethernet.ino
+	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED', stdin) >! $target
+
+# TODO make this more readable
+all : $DIR_DOKTER/common.lib.ino $DIR_HEKSEN/common.lib.ino $DIR_HEKSEN/ethernet.lib.ino
