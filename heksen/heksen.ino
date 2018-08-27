@@ -18,7 +18,7 @@
 #define BUTTON_DEBOUNCING_TIME 50 // [milliseconds]
 
 // stone pile constants
-#define STONE_PILE_SUPPLY CONTROLLINO_D4
+// 12 V and GND are also connected
 #define STONE_PILE_INT CONTROLLINO_IN1
 #define STONE_PILE_DEBOUCING_TIME 50 // [milliseconds]s
 

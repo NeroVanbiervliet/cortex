@@ -83,8 +83,12 @@ void performState() {
 // handles ethernet api request
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
-  if (apiPath == "/storm") {
+  if (apiPath == "/storm/on") {
     digitalWrite(RELAIS_LAMP_TEST, HIGH);
   }
+  else if (apiPath == "/storm/off") {
+    digitalWrite(RELAIS_LAMP_TEST, LOW); 
+  }
+  
 }
 
