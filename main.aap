@@ -18,11 +18,11 @@ $DIR_JAGERS/common.lib.ino : lib/common.ino
 
 # copies and replaces mac address
 $DIR_HEKSEN/ethernet.lib.ino : lib/ethernet.ino
-	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED', stdin) >! $target
+	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED', stdin) | :eval re.sub('@server_ip@', '192, 168, 0, 101', stdin) | :eval re.sub('@server_port@', '13809', stdin) >! $target
 
-# TODO same issue, but differnt mac!
+# TODO same issue, but different mac!
 $DIR_JAGERS/ethernet.lib.ino : lib/ethernet.ino
-	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF', stdin) >! $target
+	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF', stdin) | :eval re.sub('@server_ip@', '192, 168, 0, 101', stdin) | :eval re.sub('@server_port@', '13809', stdin) >! $target
 
 # TODO make this more readable
 all : $DIR_DOKTER/common.lib.ino $DIR_HEKSEN/common.lib.ino $DIR_HEKSEN/ethernet.lib.ino $DIR_JAGERS/ethernet.lib.ino $DIR_JAGERS/common.lib.ino

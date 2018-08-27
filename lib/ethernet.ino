@@ -1,84 +1,84 @@
-// interfacing with this module requires implementation of a handleApiRequest function in the main file
-// this function must handle incoming api path Strings
-
 #include <Ethernet.h>
 
-// api url string to match 
-const char* API_URL = "/api/";
-int charCounter = 0; // counts how many characters of API_URL are already matched
-bool apiUrlMatch = false; // true if API_URL has been matched
-
 // mac address WARNING must be different for each controllino
-// @mac_address@ will be replaced by aap build process (see readme)
-byte mac[] = {
-  @mac_address@ // e.g. 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
+// @something@ will be replaced by aap build process (see readme)
+byte mac[] = { @mac_address@ }; // e.g. 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
+byte serverIp[] = { @server_ip@ }; // e.g. 192, 168, 100, 185
+unsigned int serverPort = @server_port@; // e.g. 13809
 
-// server at port 80
-EthernetServer server(80);
+// client object
+EthernetClient client;
 
-// the connecting client
-// TODO bad design because only one client can be handled
-// initial code did not have this global variable
-// instead, the client was passed as a parameter to the handleClient function
-// but the compiler refused because EthernetClient was not a known parameter type...
-EthernetClient client; 
+// TCP variables
+bool isConnected = false;
+String incomingMessage = "";
+char messageToSend[] = ""; 
+String MESSAGE_SPLIT_STRING = "_NEXT_ERSCOMMAND_";
+char MESSAGE_SPLIT_STRING_CHAR[] = "_NEXT_ERSCOMMAND_"; // TODO refactor to make this obsolete (strcpy, toCharArray)
 
-void ethernetSetup() {
+void reConnect() {    
   Ethernet.begin(mac);
-  server.begin();
-  Serial.print("server is at ");
+  delay(1000); // TODO necessary? 
+  Serial.print("Controllino ip is ");
   Serial.println(Ethernet.localIP()); 
+
+  if (client.connect(serverIp, serverPort)) {
+    client.flush();
+    isConnected = true;
+  } 
+
+  Serial.println(isConnected ? "Connected with server" : "Failed to connect to server"); 
 }
 
-void listenOnEthernet() {
-  // listen for incoming clients
-  client = server.available();
-  if (client) handleClient();  
+// is executed during loop
+void handleEthernet() {
+  // check if connection is alive
+  if (isConnected) {
+    if (client.available()) readIncomingMessage();
+    writeOutgoingMessage();
+  }
+  else if (!client.connected()) {
+    Serial.println("Disconnected");
+    client.stop();
+    isConnected = false;
+    reConnect(); 
+  }  
 }
 
-void handleClient() {
-    // an http request ends with a blank line
-    boolean currentLineIsBlank = true; 
-    String apiCommand = ""; 
-    
-    while (client.connected()) {
-      if (client.available()) {
+// read an incoming message and dispatch it to handleApiRequest
+void readIncomingMessage() {
+  char newChar = client.read();
+  incomingMessage += String(newChar);
 
-        // read incoming characters and read out REST api path: /api</path> (space terminates a path)
-        char c = client.read();
-        if(!apiUrlMatch && c == API_URL[charCounter]) {
-          charCounter++;
-          if(charCounter == 5) apiUrlMatch = true; // 5 is number of characters in "/api/" 
-        }
-        if(c == ' ') {apiUrlMatch = false; charCounter = 0; }
-        if(apiUrlMatch) apiCommand += String(c);
-
-        
-        // a http request end upon receiving \n and the current line contained no characters (blank)
-        if (c == '\n' && currentLineIsBlank) {
-          sendHttpResponse();           
-          handleApiRequest(apiCommand); 
-          break;
-        }
-        if (c == '\n') {
-          currentLineIsBlank = true; // starting a new line
-        } else if (c != '\r') {
-          currentLineIsBlank = false; // there is a character on the current line
-        }
-      }
-    }
-    
-    delay(1); // give the web browser time to receive the data
-    client.stop(); // close the connection
+  if (incomingMessage.endsWith(MESSAGE_SPLIT_STRING)) {
+    client.flush();
+    // TODO remove l last characters (where l = len of MESSAGE_SPLIT_STRING)
+    handleApiRequest(incomingMessage); // must be implemented by main file (interfacing contract)
+    incomingMessage="";
+  }
 }
 
-void sendHttpResponse() {
-  // send a standard http response header
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println("Connection: close");  // the connection will be closed after completion of the response
-  client.println();
+// set a new message to be send to the server
+// this message will be sent the following time handleEthernet() is called
+void setMessageToSend(char message[]) {
+  strcpy(messageToSend, message); 
 }
+
+// write a message to the server if a message is present
+void writeOutgoingMessage() {
+  if (strcmp(messageToSend,"") != 0) {
+    // escape room software expects an action name
+    // e.g. @Action.victory.ers
+    client.write(prepMessage(messageToSend));
+    strcpy(messageToSend,""); // clear message
+  }
+}
+
+// append fixed string to message
+char *prepMessage(char message[]) {
+  return strcat(message, MESSAGE_SPLIT_STRING_CHAR);  
+}
+
+
 
 

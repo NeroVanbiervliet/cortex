@@ -19,7 +19,10 @@ Building is done using [aap](http://www.a-a-p.org/). Run `aap` to update `*.lib.
 
 #### lib/ethernet.ino
 
-*Purpose:* HTTP interfacing
+*Purpose:* TCP interfacing
 
-*Interfacing:* requires implementation of `handleApiRequest(String apiPath)`
+*Interfacing:* 
+
+* requires implementation of `handleApiRequest(String apiPath)`
+* requires regularly calling of `handleEthernet()` , e.g. in `loop()`
 

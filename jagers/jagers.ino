@@ -42,11 +42,10 @@ void setup() {
 
   // setup needed for common file and scale file
   commonSetup(); 
-  ethernetSetup();
 }
 
 void loop() {
-  listenOnEthernet(); // NEED delay nodig?
+  handleEthernet(); // NEED delay nodig?
 }
 
 void buttonIsr() {
@@ -89,6 +88,8 @@ void handleApiRequest(String apiPath) {
   else if (apiPath == "/storm/off") {
     digitalWrite(RELAIS_LAMP_TEST, LOW); 
   }
-  
+  else if (apiPath == "storm-on_NEXT_ERSCOMMAND_") { 
+    setMessageToSend("@Action.ServerTest.ers"); 
+  }
 }
 

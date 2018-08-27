@@ -58,11 +58,10 @@ void setup() {
   // setup needed for common file and scale file
   commonSetup(); 
   scaleSetup(); 
-  ethernetSetup();
 }
 
 void loop() {
-  listenOnEthernet(); // NEED delay nodig?
+  handleEthernet(); // NEED delay nodig?
 }
 
 void buttonIsr() {
