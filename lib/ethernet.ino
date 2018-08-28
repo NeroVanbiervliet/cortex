@@ -13,8 +13,7 @@ EthernetClient client;
 bool isConnected = false;
 String incomingMessage = "";
 char messageToSend[] = ""; 
-String MESSAGE_SPLIT_STRING = "_NEXT_ERSCOMMAND_";
-char MESSAGE_SPLIT_STRING_CHAR[] = "_NEXT_ERSCOMMAND_"; // TODO refactor to make this obsolete (strcpy, toCharArray)
+#define MESSAGE_SPLIT_SEQUENCE "_NEXT_ERSCOMMAND_"
 
 void reConnect() {    
   Ethernet.begin(mac);
@@ -50,10 +49,10 @@ void readIncomingMessage() {
   char newChar = client.read();
   incomingMessage += String(newChar);
 
-  if (incomingMessage.endsWith(MESSAGE_SPLIT_STRING)) {
+  if (incomingMessage.endsWith(MESSAGE_SPLIT_SEQUENCE)) {
     client.flush();
-    // TODO remove l last characters (where l = len of MESSAGE_SPLIT_STRING)
-    handleApiRequest(incomingMessage); // must be implemented by main file (interfacing contract)
+    incomingMessage = incomingMessage.substring(0, incomingMessage.indexOf(MESSAGE_SPLIT_SEQUENCE)); // removes the MESSAGE_SPLIT_SEQUENCE
+    handleApiRequest(incomingMessage); // must be implemented by main file to use this 'library'
     incomingMessage="";
   }
 }
@@ -76,7 +75,7 @@ void writeOutgoingMessage() {
 
 // append fixed string to message
 char *prepMessage(char message[]) {
-  return strcat(message, MESSAGE_SPLIT_STRING_CHAR);  
+  return strcat(message, MESSAGE_SPLIT_SEQUENCE);  
 }
 
 

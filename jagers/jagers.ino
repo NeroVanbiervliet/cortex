@@ -84,12 +84,10 @@ void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
   if (apiPath == "/storm/on") {
     digitalWrite(RELAIS_LAMP_TEST, HIGH);
+    setMessageToSend("@Action.ServerTest.ers"); 
   }
   else if (apiPath == "/storm/off") {
     digitalWrite(RELAIS_LAMP_TEST, LOW); 
-  }
-  else if (apiPath == "storm-on_NEXT_ERSCOMMAND_") { 
-    setMessageToSend("@Action.ServerTest.ers"); 
   }
 }
 
