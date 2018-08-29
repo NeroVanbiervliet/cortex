@@ -50,11 +50,12 @@ void loop() {
 
 void buttonIsr() {
   if (digitalRead(BUTTON_INT) == HIGH) {
-    lastButtonPress = millis(); 
+    lastButtonPress = millis();
   }
   else {
     // if debouncing passes, STATE_VICTORY is reached
-    if (millis() - lastButtonPress > BUTTON_DEBOUNCING_TIME && state == STATE_INIT) nextState();
+    int deltaTime = millis() - lastButtonPress;
+    if (deltaTime > BUTTON_DEBOUNCING_TIME && state == STATE_INIT) nextState();
   }
 }
 
@@ -72,8 +73,8 @@ void nextState() {
 void performState() {
   switch (state) {
     case STATE_VICTORY:
-    makeSound(SND_VICTORY); 
-    // NEED send signal to stop timer (houdini)
+    makeSound(SND_VICTORY);
+    setMessageToSend("@Action.victory.ers"); 
     // NEED strobe
     break; 
   }
@@ -83,7 +84,7 @@ void performState() {
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
   if (apiPath == "/storm/on") {
-    digitalWrite(RELAIS_LAMP_TEST, HIGH);
+    digitalWrite(RELAIS_LAMP_TEST, HIGH); 
     setMessageToSend("@Action.ServerTest.ers"); 
   }
   else if (apiPath == "/storm/off") {
