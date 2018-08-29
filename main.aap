@@ -1,28 +1,35 @@
+:include config.aap
+
 # constants
 DIR_DOKTER = dokter
 DIR_HEKSEN = heksen
 DIR_JAGERS = jagers
 
-# syntax = target : list-of-dependencies
-# merely copies the common.ino file
-$DIR_DOKTER/common.lib.ino : lib/common.ino
-	:cat $source  >! $target
-
-# TODO same as previous command, how to set multiple targets?
-$DIR_HEKSEN/common.lib.ino : lib/common.ino
-	:cat $source >! $target
-
-# TODO same issue
-$DIR_JAGERS/common.lib.ino : lib/common.ino
-	:cat $source >! $target
+$DIR_DOKTER $DIR_HEKSEN $DIR_JAGERS : lib/common.ino
+    @for dir in target_list:
+        :cat $source >! $dir/common.lib.ino
 
 # copies and replaces mac address
+# syntax = target : list-of-dependencies
+# _top is needed to access top level variable scope
 $DIR_HEKSEN/ethernet.lib.ino : lib/ethernet.ino
-	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED', stdin) | :eval re.sub('@server_ip@', '192, 168, 0, 101', stdin) | :eval re.sub('@server_port@', '13809', stdin) >! $target
+	:cat $source \
+    | :eval re.sub('@mac_address@', _top.MAC_HEKSEN, stdin) \
+    | :eval re.sub('@server_ip@', _top.IP_HEKSEN, stdin) \
+    | :eval re.sub('@server_port@', '13809', stdin) >! $target
 
-# TODO same issue, but different mac!
+# TODO not DRY, same code but different variables
 $DIR_JAGERS/ethernet.lib.ino : lib/ethernet.ino
-	:cat $source | :eval re.sub('@mac_address@', '0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEF', stdin) | :eval re.sub('@server_ip@', '192, 168, 0, 101', stdin) | :eval re.sub('@server_port@', '13809', stdin) >! $target
+	:cat $source \
+    | :eval re.sub('@mac_address@', _top.MAC_JAGERS, stdin) \
+    | :eval re.sub('@server_ip@', _top.IP_JAGERS, stdin) \
+    | :eval re.sub('@server_port@', '13809', stdin) >! $target
 
-# TODO make this more readable
-all : $DIR_DOKTER/common.lib.ino $DIR_HEKSEN/common.lib.ino $DIR_HEKSEN/ethernet.lib.ino $DIR_JAGERS/ethernet.lib.ino $DIR_JAGERS/common.lib.ino
+# generate all these files
+all : \
+    $DIR_HEKSEN/ethernet.lib.ino \
+    $DIR_JAGERS/ethernet.lib.ino \
+    $DIR_DOKTER \
+    $DIR_HEKSEN \
+    $DIR_JAGERS
+    
