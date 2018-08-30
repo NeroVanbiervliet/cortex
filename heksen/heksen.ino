@@ -32,6 +32,10 @@
 #define SND_COMPARTMENT_OPEN "T3"
 #define SND_VICTORY "T4"
 
+// required by storm.lib
+#define RELAIS_STROBOSCOPE CONTROLLINO_R5
+void performStorm(boolean silent=false); // prototype
+
 // state management
 int state = STATE_INIT;
 
@@ -127,6 +131,7 @@ void performState() {
 // handles ethernet api request
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
-  // NEED implementation
+  if (apiPath == "/storm") {
+    performStorm();   
+  }
 }
-

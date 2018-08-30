@@ -2,7 +2,6 @@
 #include <Controllino.h> 
 
 // timing constants [seconds]
-#define TIME_STROBE_ON 5
 #define TIME_BETWEEN_WEIGHINGS 1
 
 // state constants
@@ -18,8 +17,9 @@
 #define SND_STORM "T1"
 #define SND_VICTORY "T2"
 
-// for testing purpose NEED remove
-#define RELAIS_LAMP_TEST CONTROLLINO_R9
+// required by storm.lib
+#define RELAIS_STROBOSCOPE CONTROLLINO_R5
+void performStorm(boolean silent=false); // prototype
 
 // state management
 int state = STATE_INIT;
@@ -31,17 +31,16 @@ void setup() {
   // pinmodes
   pinMode(BUTTON_SUPPLY, OUTPUT);
   pinMode(BUTTON_INT, INPUT);
-  pinMode(RELAIS_LAMP_TEST, OUTPUT); 
 
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
-  digitalWrite(RELAIS_LAMP_TEST, LOW); // NEED remove
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
 
   // setup needed for common file and scale file
   commonSetup(); 
+  stormSetup(); 
 }
 
 void loop() {
@@ -75,7 +74,7 @@ void performState() {
     case STATE_VICTORY:
     makeSound(SND_VICTORY);
     setMessageToSend("@Action.victory.ers"); 
-    // NEED strobe
+    performStorm(true);
     break; 
   }
 }
@@ -83,12 +82,9 @@ void performState() {
 // handles ethernet api request
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
-  if (apiPath == "/storm/on") {
-    digitalWrite(RELAIS_LAMP_TEST, HIGH); 
-    setMessageToSend("@Action.ServerTest.ers"); 
-  }
-  else if (apiPath == "/storm/off") {
-    digitalWrite(RELAIS_LAMP_TEST, LOW); 
+  if (apiPath == "/storm") {
+    performStorm();   
   }
 }
+
 

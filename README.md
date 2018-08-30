@@ -32,3 +32,17 @@ Building is done using [aap](http://www.a-a-p.org/). Run `aap` to update `*.lib.
 * requires implementation of `handleApiRequest(String apiPath)`
 * requires regularly calling of `handleEthernet()` , e.g. in `loop()`
 
+
+
+### lib/storm.ino
+
+*Purpose:* performing a storm using a combination of light flashing and sound
+
+*Interfacing:* 
+
+* requires a `#define` macro for 
+  * `SND_STORM` (sound effect to be played)
+  * `RELAIS_STROBOSCOPE` (relais pin of stroboscope)
+* provide signature (prototype) for `performStorm` function: 
+  `void performStorm(boolean silent=false);`
+

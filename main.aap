@@ -5,9 +5,13 @@ DIR_DOKTER = dokter
 DIR_HEKSEN = heksen
 DIR_JAGERS = jagers
 
-$DIR_DOKTER $DIR_HEKSEN $DIR_JAGERS : lib/common.ino
+# TODO [:1] is not transparant 
+# copy common lib and storm lib
+$DIR_DOKTER $DIR_HEKSEN $DIR_JAGERS :
     @for dir in target_list:
-        :cat $source >! $dir/common.lib.ino
+        :cat lib/common.ino >! $dir/common.lib.ino
+    @for dir in target_list[1:]:
+        :cat lib/storm.ino >! $dir/storm.lib.ino
 
 # copies and replaces mac address
 # syntax = target : list-of-dependencies
@@ -32,4 +36,3 @@ all : \
     $DIR_DOKTER \
     $DIR_HEKSEN \
     $DIR_JAGERS
-    
