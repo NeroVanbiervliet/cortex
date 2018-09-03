@@ -21,6 +21,9 @@
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
 void performStorm(boolean silent=false); // prototype
 
+// cross magnet
+#define RELAIS_MAGNET_CROSS CONTROLLINO_R9
+
 // state management
 int state = STATE_INIT;
 
@@ -31,9 +34,11 @@ void setup() {
   // pinmodes
   pinMode(BUTTON_SUPPLY, OUTPUT);
   pinMode(BUTTON_INT, INPUT);
+  pinMode(RELAIS_MAGNET_CROSS, OUTPUT); 
 
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
+  digitalWrite(RELAIS_MAGNET_CROSS, HIGH); 
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
@@ -82,9 +87,8 @@ void performState() {
 // handles ethernet api request
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
-  if (apiPath == "/storm") {
-    performStorm();   
-  }
+  if (apiPath == "/storm") performStorm();
+  else if (apiPath == "/cross/magnet/off") digitalWrite(RELAIS_MAGNET_CROSS, LOW); 
 }
 
 
