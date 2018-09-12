@@ -67,7 +67,9 @@ void setup() {
 }
 
 
-void loop() {} // empty
+void loop() {
+  handleEthernet(); // NEED delay nodig?
+}
 
 void keypadIsr() {
   if (digitalRead(KEYPAD_INT) == HIGH) {
@@ -173,5 +175,9 @@ void performState() {
   }
 }
 
-
+// handles ethernet api request
+void handleApiRequest(String apiPath) {
+  Serial.println("api request received at path: " + apiPath); 
+  // empty
+}
 
