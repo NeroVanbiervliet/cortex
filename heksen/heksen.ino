@@ -53,7 +53,7 @@ void setup() {
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
   digitalWrite(RELAIS_MAGNET_DOOR, HIGH); 
-  digitalWrite(RELAIS_MAGNET_COMPARTMENT, HIGH); 
+  digitalWrite(RELAIS_MAGNET_COMPARTMENT, HIGH);
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
@@ -131,7 +131,7 @@ void performState() {
 // handles ethernet api request
 void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
-  if (apiPath == "/storm") {
-    performStorm();   
-  }
+  if (apiPath == "/storm") performStorm();   
+  else if (apiPath == "/door/magnet/off") digitalWrite(RELAIS_MAGNET_DOOR, LOW); 
+  else if (apiPath == "/door/magnet/on") digitalWrite(RELAIS_MAGNET_DOOR, HIGH); 
 }

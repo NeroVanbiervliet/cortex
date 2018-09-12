@@ -34,7 +34,7 @@ Building is done using [aap](http://www.a-a-p.org/). Run `aap` to update `*.lib.
 
 
 
-### lib/storm.ino
+#### lib/storm.ino
 
 *Purpose:* performing a storm using a combination of light flashing and sound
 

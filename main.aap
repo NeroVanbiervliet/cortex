@@ -29,8 +29,16 @@ $DIR_JAGERS/ethernet.lib.ino : lib/ethernet.ino
     | :eval re.sub('@server_ip@', _top.IP_JAGERS, stdin) \
     | :eval re.sub('@server_port@', '13809', stdin) >! $target
 
+# TODO idem
+$DIR_DOKTER/ethernet.lib.ino : lib/ethernet.ino
+	:cat $source \
+    | :eval re.sub('@mac_address@', _top.MAC_DOKTER, stdin) \
+    | :eval re.sub('@server_ip@', _top.IP_DOKTER, stdin) \
+    | :eval re.sub('@server_port@', '13809', stdin) >! $target
+
 # generate all these files
 all : \
+    $DIR_DOKTER/ethernet.lib.ino \
     $DIR_HEKSEN/ethernet.lib.ino \
     $DIR_JAGERS/ethernet.lib.ino \
     $DIR_DOKTER \
