@@ -18,12 +18,6 @@
 #define KEYPAD_DEBOUNCING_TIME 50 // [milliseconds]
 int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
 
-// sound constants
-#define SND_KEY_PRESS "T2"
-#define SND_BAD_CODE "T3"
-#define SND_GOOD_CODE "T5"
-#define SND_ALARM "T4"
-
 // other constants
 #define SUPPLY_ALARM_LIGHT CONTROLLINO_D11 // red flashing light
 #define RELAIS_SMOKE CONTROLLINO_R8
@@ -85,13 +79,13 @@ void keypadIsr() {
 void registerLastDigit() {
   keypadCodeAttempt[codeIndex] = lastDigit; 
   codeIndex++;
-  makeSound(SND_KEY_PRESS);
+  makeSound("keyPress");
 
   // check code
   if (codeIndex == 4) {
     codeIndex = 0;
-    if (checkKeyPadCode()) { makeSound(SND_GOOD_CODE); nextState(); }
-    else makeSound(SND_BAD_CODE); 
+    if (checkKeyPadCode()) { makeSound("goodCode"); nextState(); }
+    else makeSound("badCode"); 
   }
 }
 
@@ -159,7 +153,7 @@ void performState() {
     break;
     
     case STATE_PLAY_AUDIO:
-    makeSound(SND_ALARM); 
+    makeSound("alarm"); 
     nextState(); 
     break; 
 
