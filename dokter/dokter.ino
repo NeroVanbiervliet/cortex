@@ -22,6 +22,7 @@ int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
 #define SUPPLY_ALARM_LIGHT CONTROLLINO_D11 // red flashing light
 #define RELAIS_SMOKE CONTROLLINO_R8
 #define RELAIS_LASERS CONTROLLINO_R9
+#define RELAIS_MAIN_LIGHT CONTROLLINO_R5
 
 // debouncing
 unsigned long lastKeyPress;
@@ -46,12 +47,14 @@ void setup() {
   pinMode(SUPPLY_ALARM_LIGHT, OUTPUT); 
   pinMode(RELAIS_LASERS, OUTPUT); 
   pinMode(RELAIS_SMOKE, OUTPUT); 
+  pinMode(RELAIS_MAIN_LIGHT, OUTPUT); 
 
   // default states of outputs 
   digitalWrite(KEYPAD_SUPPLY, HIGH); 
   digitalWrite(SUPPLY_ALARM_LIGHT, LOW);  
   digitalWrite(RELAIS_LASERS, LOW); 
   digitalWrite(RELAIS_SMOKE, LOW); 
+  digitalWrite(RELAIS_MAIN_LIGHT, HIGH); 
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
@@ -149,6 +152,7 @@ void performState() {
     case STATE_ACTIVE:
     digitalWrite(RELAIS_LASERS, HIGH); 
     digitalWrite(SUPPLY_ALARM_LIGHT, HIGH); 
+    digitalWrite(RELAIS_MAIN_LIGHT, LOW); 
     nextState(); 
     break;
     
