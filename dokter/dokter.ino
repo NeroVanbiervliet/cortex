@@ -80,7 +80,8 @@ void keypadIsr() {
 
 // if deboucing passes, register the last digit
 void registerLastDigit() {
-  keypadCodeAttempt[codeIndex] = lastDigit; 
+  keypadCodeAttempt[codeIndex] = lastDigit;
+  Serial.println(lastDigit); 
   codeIndex++;
   makeSound("keyPress");
 
@@ -96,7 +97,7 @@ void registerLastDigit() {
 bool checkKeyPadCode() {
   bool match = true;
   for (int i=0; i<4; i++) {
-    match = match && (keypadCodeAttempt[i] == keypadCodeTruth[i]);
+    match = match && ((keypadCodeAttempt[i] == keypadCodeTruth[i]) || ((i==2) && (keypadCodeAttempt[i] == 10)));
   }
   return match;
 }
