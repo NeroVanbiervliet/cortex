@@ -24,6 +24,9 @@ void performStorm(boolean silent=false); // prototype
 // cross magnet
 #define RELAIS_MAGNET_CROSS CONTROLLINO_R9
 
+// blacklight
+#define RELAIS_BLACKLIGHT CONTROLLINO_R3
+
 // state management
 int state = STATE_INIT;
 
@@ -35,10 +38,12 @@ void setup() {
   pinMode(BUTTON_SUPPLY, OUTPUT);
   pinMode(BUTTON_INT, INPUT);
   pinMode(RELAIS_MAGNET_CROSS, OUTPUT); 
+  pinMode(RELAIS_BLACKLIGHT, OUTPUT);
 
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
   digitalWrite(RELAIS_MAGNET_CROSS, HIGH); 
+  digitalWrite(RELAIS_BLACKLIGHT, LOW);
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
@@ -89,6 +94,5 @@ void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
   if (apiPath == "/storm") performStorm();
   else if (apiPath == "/cross/magnet/off") digitalWrite(RELAIS_MAGNET_CROSS, LOW); 
+  else if (apiPath == "/blacklight/on") digitalWrite(RELAIS_BLACKLIGHT, HIGH);
 }
-
-
