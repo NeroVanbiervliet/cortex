@@ -3,6 +3,19 @@
 This repository contains the arduino sketches for PLC's used in the cortex escape room. 
 The escape game has three rooms to play, each of which has its own directory (dokter, heksen, jagers). 
 
+
+
+## Dependencies
+
+* Install through arduino library manager
+  * Controllino
+  * TimerOne
+  * MsTimer2
+* Download zip, extract, rename: [HX711](https://github.com/bogde/HX711)
+* Install through board mangager: [Controllino boards](https://github.com/CONTROLLINO-PLC/CONTROLLINO_Library#installation-guide)
+
+
+
 ## Configuration
 
 Configuration is done using the `config.aap` file, which is loaded during building. An example configuration file is provided: `config.example.aap`. **Warning:** building will fail without config file. 
