@@ -4,9 +4,9 @@
 // GND and 5V are also connected
 #define SCALE_DOUT CONTROLLINO_D11
 #define SCALE_CLK CONTROLLINO_D10
-#define CALIBRATION_FACTOR -799650 // obtained with other sketch
-#define EXPECTED_WEIGHT 42 // [grams]
-#define TOLERANCE 2 // tolerated fault above and below [grams]
+#define CALIBRATION_FACTOR -99650 // obtained with other sketch
+#define EXPECTED_WEIGHT 545 // [grams] mushroom (172) + mandrake (144) + water flask (229)
+#define TOLERANCE 10 // tolerated fault above and below [grams]
 HX711 scale(SCALE_DOUT, SCALE_CLK);
 
 // indicates wether correct weight was measured
@@ -19,12 +19,14 @@ void scaleSetup() {
 }
 
 int getWeight() {
-  return (int) scale.get_units()*1000; 
+  return scale.get_units()*1000; 
 }
 
 // weighs ingredients in kettle and checks with expected value
 void weighKettle() {
-  int weight = getWeight(); 
+  int weight = getWeight();
+  Serial.print("Weight: ");
+  Serial.println(weight); 
   if (weight > EXPECTED_WEIGHT-TOLERANCE && weight < EXPECTED_WEIGHT+TOLERANCE) correctWeight = true;
   launchStateTimer(TIME_BETWEEN_WEIGHINGS);
 }
@@ -33,4 +35,3 @@ void weighKettle() {
 bool isCorrectWeight() {
   return correctWeight; 
 }
-

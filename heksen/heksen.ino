@@ -3,7 +3,7 @@
 
 // timing constants [seconds]
 #define TIME_STROBE_ON 5
-#define TIME_BETWEEN_WEIGHINGS 1
+#define TIME_BETWEEN_WEIGHINGS 2 // unsolved error when lower than 2...
 
 // state constants
 #define STATE_INIT 0
@@ -37,7 +37,7 @@
 void performStorm(boolean silent=false); // prototype
 
 // state management
-int state = STATE_INIT;
+int state = STATE_WEIGH_KETTLE;
 
 // debouncing
 unsigned long lastButtonPress = 42; // default value :) 
@@ -62,6 +62,9 @@ void setup() {
   // setup needed for common file and scale file
   commonSetup(); 
   scaleSetup(); 
+
+  // NEED remove
+  performState();
 }
 
 void loop() {
@@ -134,4 +137,6 @@ void handleApiRequest(String apiPath) {
   if (apiPath == "/storm") performStorm();   
   else if (apiPath == "/door/magnet/off") digitalWrite(RELAIS_MAGNET_DOOR, LOW); 
   else if (apiPath == "/door/magnet/on") digitalWrite(RELAIS_MAGNET_DOOR, HIGH); 
+  else if (apiPath == "/compartment/magnet/off") digitalWrite(RELAIS_MAGNET_COMPARTMENT, LOW);
+  else if (apiPath == "/compartment/magnet/on") digitalWrite(RELAIS_MAGNET_COMPARTMENT, HIGH);
 }
