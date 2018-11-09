@@ -9,9 +9,8 @@ void stormSetup() {
     MsTimer2::set(TIME_STROBE_ON, endStorm);
 }
 
-void performStorm(boolean silent=false) {
+void performStorm() {
   Serial.println("performing Storm"); 
-  if (!silent) makeSound(SND_STORM); 
   digitalWrite(RELAIS_STROBOSCOPE, HIGH); 
 
   // timer will end the storm

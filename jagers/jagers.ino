@@ -14,7 +14,6 @@
 #define BUTTON_DEBOUNCING_TIME 50 // [milliseconds]
 
 // sound constants
-#define SND_STORM "T1"
 #define SND_VICTORY "T2"
 
 // required by storm.lib

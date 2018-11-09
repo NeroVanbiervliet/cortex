@@ -27,17 +27,15 @@
 #define RELAIS_MAGNET_COMPARTMENT CONTROLLINO_R7
 
 // sound constants
-#define SND_STORM "T1"
 #define SND_DOOR_OPEN "T2"
 #define SND_COMPARTMENT_OPEN "T3"
 #define SND_VICTORY "T4"
 
 // required by storm.lib
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
-void performStorm(boolean silent=false); // prototype
 
 // state management
-int state = STATE_WEIGH_KETTLE;
+int state = STATE_INIT;
 
 // debouncing
 unsigned long lastButtonPress = 42; // default value :) 
