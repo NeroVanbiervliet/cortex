@@ -1,6 +1,6 @@
 #include <MsTimer2.h>
 
-#define TIME_STROBE_ON 5000 // milliseconds
+#define TIME_STROBE_ON 2500 // milliseconds
 
 
 void stormSetup() {

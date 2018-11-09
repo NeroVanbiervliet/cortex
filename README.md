@@ -22,11 +22,21 @@ Configuration is done using the `config.aap` file, which is loaded during buildi
 
 Variables to be set include server ip addresses and mac addresses for the devices. 
 
+
+
 ## Building
 
 The files below are shared between the rooms. For lack of better arduino `include` mechanisms, these files are duplicated by a build script. The source files are located in the `lib` directory. 
 
 Building is done using [aap](http://www.a-a-p.org/). Run `aap` to update `*.lib.ino` files. 
+
+
+
+## Libraries
+
+Libraries define shared code between different rooms. Most of them require calling a `setup` function during the `setup()` phase in the main code file. Some require additional interfacing. 
+
+
 
 #### lib/common.ino
 

@@ -2,7 +2,6 @@
 #include <Controllino.h> 
 
 // timing constants [seconds]
-#define TIME_STROBE_ON 5
 #define TIME_BETWEEN_WEIGHINGS 2 // unsolved error when lower than 2...
 
 // state constants
@@ -60,6 +59,7 @@ void setup() {
   // setup needed for common file and scale file
   commonSetup(); 
   scaleSetup(); 
+  stormSetup(); 
 
   // NEED remove
   performState();
