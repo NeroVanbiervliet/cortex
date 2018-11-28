@@ -1,10 +1,10 @@
 // timer
-int timerRemainingCount; // remaining seconds in timer
+int timerRemainingCount; // remaining deciseconds in timer
 
 // code that is called during setup()
 void commonSetup() {
   // timer, cannot be initialised outside setup()!
-  Timer1.initialize(1000000); // 1 second period
+  Timer1.initialize(100000); // 0.1 second period
   Timer1.attachInterrupt(timerIsr); 
   Timer1.stop(); 
 
@@ -27,7 +27,12 @@ void makeSound(String soundName) {
 
 // launch timer until next state
 void launchStateTimer(int seconds) {
-  timerRemainingCount = seconds; 
+  launchStateTimerDs(seconds*10);  
+}
+
+// launch timer until next state
+void launchStateTimerDs(int deciseconds) {
+  timerRemainingCount = deciseconds;
   Timer1.start(); 
 }
 
