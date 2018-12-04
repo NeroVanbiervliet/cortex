@@ -18,7 +18,6 @@
 
 // required by storm.lib
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
-void performStorm(boolean silent=false); // prototype
 
 // cross magnet
 #define RELAIS_MAGNET_CROSS CONTROLLINO_R9
@@ -83,7 +82,7 @@ void performState() {
     case STATE_VICTORY:
     makeSound(SND_VICTORY);
     setMessageToSend("@Action.victory.ers"); 
-    performStorm(true);
+    performStorm();
     break; 
   }
 }
