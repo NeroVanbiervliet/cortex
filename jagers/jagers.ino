@@ -41,7 +41,7 @@ void setup() {
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
   digitalWrite(RELAIS_MAGNET_CROSS, HIGH); 
-  digitalWrite(RELAIS_BLACKLIGHT, LOW);
+  digitalWrite(RELAIS_BLACKLIGHT, HIGH);
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
@@ -93,4 +93,5 @@ void handleApiRequest(String apiPath) {
   if (apiPath == "/storm") performStorm();
   else if (apiPath == "/cross/magnet/off") digitalWrite(RELAIS_MAGNET_CROSS, LOW); 
   else if (apiPath == "/blacklight/on") digitalWrite(RELAIS_BLACKLIGHT, HIGH);
+  else if (apiPath == "/blacklight/off") digitalWrite(RELAIS_BLACKLIGHT, LOW);
 }

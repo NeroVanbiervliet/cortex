@@ -49,7 +49,7 @@ void setup() {
 
   // default states of outputs
   digitalWrite(BUTTON_SUPPLY, HIGH); 
-  digitalWrite(RELAIS_MAGNET_DOOR, HIGH); 
+  digitalWrite(RELAIS_MAGNET_DOOR, LOW);
   digitalWrite(RELAIS_MAGNET_COMPARTMENT, HIGH);
 
   // interrupts
