@@ -24,6 +24,8 @@ void reConnect() {
   if (client.connect(serverIp, serverPort)) {
     client.flush();
     isConnected = true;
+    // not used by dokter
+    setMessageToSend("@Action.controllino-check.ers");
   } 
 
   Serial.println(isConnected ? "Connected with server" : "Failed to connect to server"); 
