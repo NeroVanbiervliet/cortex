@@ -10,7 +10,7 @@
 #define STATE_ACTIVE 1
 #define STATE_PLAY_AUDIO 2
 #define STATE_SMOKE 3
-#define STATE_WAIT 4
+#define STATE_SMOKE_OFF 4
 
 // keypad constants
 #define KEYPAD_SUPPLY CONTROLLINO_D0
@@ -139,8 +139,8 @@ void nextState() {
   if (state == STATE_ACTIVE && !firstActivation) nextState = STATE_SMOKE;
   if (state == STATE_ACTIVE && firstActivation) { nextState = STATE_PLAY_AUDIO; firstActivation = false; }
   if (state == STATE_PLAY_AUDIO) nextState = STATE_SMOKE; 
-  if (state == STATE_SMOKE) nextState = STATE_WAIT; 
-  if (state == STATE_WAIT) nextState = STATE_INIT; 
+  if (state == STATE_SMOKE) nextState = STATE_SMOKE_OFF; 
+  if (state == STATE_SMOKE_OFF) nextState = STATE_INIT; 
   
   Serial.println("state: " + String(nextState)); 
   state = nextState; 
@@ -149,6 +149,8 @@ void nextState() {
 
 // performs state actions
 void performState() {
+  Serial.print("STATE =");
+  Serial.println(state);
   switch (state) {
     case STATE_ACTIVE:
     digitalWrite(RELAIS_LASERS, HIGH); 
@@ -167,9 +169,9 @@ void performState() {
     launchStateTimer(TIME_SMOKE_ON); 
     break; 
 
-    case STATE_WAIT:
+    case STATE_SMOKE_OFF:
     digitalWrite(RELAIS_SMOKE, LOW); 
-    launchStateTimer(TIME_WAIT); 
+    nextState();
     break;
   }
 }
@@ -179,4 +181,3 @@ void handleApiRequest(String apiPath) {
   Serial.println("api request received at path: " + apiPath); 
   // empty
 }
-
