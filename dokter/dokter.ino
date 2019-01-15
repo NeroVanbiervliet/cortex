@@ -2,7 +2,7 @@
 #include <Controllino.h> 
 
 // timing constants [seconds]
-#define TIME_SMOKE_ON 10
+#define TIME_SMOKE_ON 4
 #define TIME_WAIT 30
 
 // state constants
