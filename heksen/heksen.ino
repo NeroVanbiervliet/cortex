@@ -118,13 +118,12 @@ void performState() {
 
     case STATE_UNLOCK_COMPARTMENT:
     digitalWrite(RELAIS_MAGNET_COMPARTMENT, LOW); 
-    makeSound(SND_COMPARTMENT_OPEN); 
+    //makeSound(SND_COMPARTMENT_OPEN);
     break;
 
     case STATE_VICTORY:
-    makeSound(SND_VICTORY); 
-    // NEED send signal to stop timer (houdini)
-    // NEED strobe
+    setMessageToSend("@Action.victory.ers");
+    performStorm();
     break; 
   }
 }

@@ -13,8 +13,8 @@
 #define BUTTON_INT CONTROLLINO_IN0
 #define BUTTON_DEBOUNCING_TIME 50 // [milliseconds]
 
-// sound constants
-#define SND_VICTORY "T2"
+// computer action constants
+#define ACTION_VICTORY "@{7d127e9d-9ce8-47c4-8248-7ba6e19ce0a1}"
 
 // required by storm.lib
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
@@ -80,8 +80,7 @@ void nextState() {
 void performState() {
   switch (state) {
     case STATE_VICTORY:
-    makeSound(SND_VICTORY);
-    setMessageToSend("@Action.victory.ers"); 
+    setMessageToSend("@Action.victory.ers");
     performStorm();
     break; 
   }
