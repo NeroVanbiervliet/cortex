@@ -1,8 +1,9 @@
 #include <TimerOne.h>
 #include <Controllino.h> 
 
-// timing constants [seconds]
-#define TIME_BETWEEN_WEIGHINGS 2 // unsolved error when lower than 2...
+// scale constants
+#define TIME_BETWEEN_WEIGHINGS 5 // [deciseconds]: 1 ds = 0.1 seconds
+#define REQUIRED_CORRECT_SAMPLES 3
 
 // state constants
 #define STATE_INIT 0
@@ -34,7 +35,7 @@
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
 
 // state management
-int state = STATE_INIT;
+int state = STATE_WEIGH_KETTLE;
 
 // debouncing
 unsigned long lastButtonPress = 42; // default value :) 
@@ -136,4 +137,5 @@ void handleApiRequest(String apiPath) {
   else if (apiPath == "/door/magnet/on") digitalWrite(RELAIS_MAGNET_DOOR, HIGH); 
   else if (apiPath == "/compartment/magnet/off") digitalWrite(RELAIS_MAGNET_COMPARTMENT, LOW);
   else if (apiPath == "/compartment/magnet/on") digitalWrite(RELAIS_MAGNET_COMPARTMENT, HIGH);
+  else if (apiPath == "/kettle/weight") debugWeight();
 }

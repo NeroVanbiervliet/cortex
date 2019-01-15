@@ -6,11 +6,11 @@
 #define SCALE_CLK CONTROLLINO_D10
 #define CALIBRATION_FACTOR -99650 // obtained with other sketch
 #define EXPECTED_WEIGHT 545 // [grams] mushroom (172) + mandrake (144) + water flask (229)
-#define TOLERANCE 10 // tolerated fault above and below [grams]
+#define TOLERANCE 30 // tolerated fault above and below [grams]
 HX711 scale(SCALE_DOUT, SCALE_CLK);
 
-// indicates wether correct weight was measured
-bool correctWeight = false;
+// indicates how many times in a row the correct weight was measured
+int correctWeight = 0;
 
 void scaleSetup() {
   // library initialisation 
@@ -22,16 +22,31 @@ int getWeight() {
   return scale.get_units()*1000; 
 }
 
+bool isWithinTolerance(int weight) {
+  return weight > EXPECTED_WEIGHT-TOLERANCE && weight < EXPECTED_WEIGHT+TOLERANCE;
+}
+
 // weighs ingredients in kettle and checks with expected value
 void weighKettle() {
   int weight = getWeight();
   Serial.print("Weight: ");
   Serial.println(weight); 
-  if (weight > EXPECTED_WEIGHT-TOLERANCE && weight < EXPECTED_WEIGHT+TOLERANCE) correctWeight = true;
-  launchStateTimer(TIME_BETWEEN_WEIGHINGS);
+  
+  if (isWithinTolerance(weight)) correctWeight += 1;
+  else correctWeight = 0;
+  Serial.print("Correctweight count: ");
+  Serial.println(correctWeight);
+  
+  launchStateTimerDs(TIME_BETWEEN_WEIGHINGS);
 }
 
 // getter needed because of scope
 bool isCorrectWeight() {
-  return correctWeight; 
+  return correctWeight >= REQUIRED_CORRECT_SAMPLES; 
+}
+
+void debugWeight() {
+  char weightStr[3];
+  sprintf(weightStr, "%03d", getWeight());
+  setMessageToSend(weightStr);
 }
