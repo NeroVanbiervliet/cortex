@@ -16,7 +16,8 @@
 #define KEYPAD_SUPPLY CONTROLLINO_D0
 #define KEYPAD_INT CONTROLLINO_IN0
 #define KEYPAD_DEBOUNCING_TIME 50 // [milliseconds]
-int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1, CONTROLLINO_A2};
+int KEYPAD_COLUMN_PINS[] = {CONTROLLINO_A0, CONTROLLINO_A1};
+#define KEYPAD_STATUS_LED CONTROLLINO_D7
 
 // other constants
 #define SUPPLY_ALARM_LIGHT CONTROLLINO_D11 // red flashing light
@@ -33,28 +34,33 @@ int state = STATE_INIT; // default state before correct keypad code is entered
 bool firstActivation = true; 
 
 // keypad code
-int keypadCodeTruth[4] = {1,4,7,4};
+int keypadCodeTruth[4] = {1,4,10,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
+
+// keypad status light (evenly spaced perceptually)
+int statusLightBrightness[4] = {0, 40, 125, 255};
 
 void setup() {
   // pinmodes
   pinMode(KEYPAD_SUPPLY, OUTPUT);
   pinMode(KEYPAD_INT, INPUT);
-  for (int i=0; i<3; i++) {
+  for (int i=0; i<2; i++) {
     pinMode(KEYPAD_COLUMN_PINS[i], INPUT); 
   }
+  pinMode(KEYPAD_STATUS_LED, OUTPUT);
   pinMode(SUPPLY_ALARM_LIGHT, OUTPUT); 
   pinMode(RELAIS_LASERS, OUTPUT); 
   pinMode(RELAIS_SMOKE, OUTPUT); 
   pinMode(RELAIS_MAIN_LIGHT, OUTPUT); 
 
   // default states of outputs 
-  digitalWrite(KEYPAD_SUPPLY, HIGH); 
+  digitalWrite(KEYPAD_SUPPLY, HIGH);
+  analogWrite(KEYPAD_STATUS_LED, 0); 
   digitalWrite(SUPPLY_ALARM_LIGHT, LOW);  
   digitalWrite(RELAIS_LASERS, LOW); 
   digitalWrite(RELAIS_SMOKE, LOW); 
-  digitalWrite(RELAIS_MAIN_LIGHT, HIGH); 
+  digitalWrite(RELAIS_MAIN_LIGHT, HIGH);
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(KEYPAD_INT), keypadIsr, CHANGE);
@@ -84,6 +90,7 @@ void registerLastDigit() {
   Serial.println(lastDigit); 
   codeIndex++;
   makeSound("keyPress");
+  setStatusLight(codeIndex); 
 
   // check code
   if (codeIndex == 4) {
@@ -91,6 +98,11 @@ void registerLastDigit() {
     if (checkKeyPadCode()) { makeSound("goodCode"); nextState(); }
     else makeSound("badCode"); 
   }
+}
+
+void setStatusLight(int codeIndex) {
+  Serial.println(statusLightBrightness[codeIndex]);
+  analogWrite(KEYPAD_STATUS_LED, statusLightBrightness[codeIndex]);
 }
 
 // check if the attempted keypad code is correct
@@ -108,7 +120,7 @@ void readKeypad() {
   delayMicroseconds(100); 
   
   // check what column caused interrupt
-  for(int column=0; column<3; column++) {
+  for(int column=0; column<2; column++) {
     float voltage = analogRead(KEYPAD_COLUMN_PINS[column]); 
     voltage = map(voltage, 0, 1023, 0, 160)/float(10); // 16 blijkbaar omdat voltage controllino tot 16V kan meten
     if (voltage > 6) {
