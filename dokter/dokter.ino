@@ -34,7 +34,7 @@ int state = STATE_INIT; // default state before correct keypad code is entered
 bool firstActivation = true; 
 
 // keypad code
-int keypadCodeTruth[4] = {1,4,10,4};
+int keypadCodeTruth[4] = {1,4,7,4};
 int keypadCodeAttempt[4];
 int codeIndex = 0;
 
@@ -101,7 +101,6 @@ void registerLastDigit() {
 }
 
 void setStatusLight(int codeIndex) {
-  Serial.println(statusLightBrightness[codeIndex]);
   analogWrite(KEYPAD_STATUS_LED, statusLightBrightness[codeIndex]);
 }
 
@@ -135,8 +134,7 @@ void readKeypad() {
 int voltageToRow(float voltage) {
   if (voltage < 9.69) return 0;
   if (voltage >= 9.69 && voltage < 10.62) return 1; 
-  if (voltage >= 10.62 && voltage < 11.54) return 2; 
-  if (voltage >= 11.54) return 3; 
+  if (voltage >= 10.62) return 2; 
 }
 
 // converts row and column indices of keypad to the digit
