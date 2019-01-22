@@ -87,6 +87,7 @@ void keypadIsr() {
 // if deboucing passes, register the last digit
 void registerLastDigit() {
   keypadCodeAttempt[codeIndex] = lastDigit;
+  Serial.print("last digit: ");
   Serial.println(lastDigit); 
   codeIndex++;
   makeSound("keyPress");
@@ -122,6 +123,10 @@ void readKeypad() {
   for(int column=0; column<2; column++) {
     float voltage = analogRead(KEYPAD_COLUMN_PINS[column]); 
     voltage = map(voltage, 0, 1023, 0, 160)/float(10); // 16 blijkbaar omdat voltage controllino tot 16V kan meten
+    Serial.print("column: ");
+    Serial.println(column); 
+    Serial.print("voltage: ");
+    Serial.println(voltage);
     if (voltage > 6) {
       int row = voltageToRow(voltage); 
       lastDigit = indicesToDigit(row, column); 
