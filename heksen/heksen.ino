@@ -6,8 +6,6 @@
 #define REQUIRED_CORRECT_SAMPLES 3
 
 // state constants
-#define STATE_INIT 0
-#define STATE_UNLOCK_DOOR 1
 #define STATE_WEIGH_KETTLE 2
 #define STATE_UNLOCK_COMPARTMENT 3
 #define STATE_VICTORY 4
@@ -17,19 +15,13 @@
 #define BUTTON_INT CONTROLLINO_IN0
 #define BUTTON_DEBOUNCING_TIME 50 // [milliseconds]
 
-// stone pile constants
-// 12 V and GND are also connected
-#define STONE_PILE_INT CONTROLLINO_IN1
-#define STONE_PILE_DEBOUCING_TIME 50 // [milliseconds]s
+// computer action constants
+#define ACTION_VICTORY "@{8308bbc1-5ca7-4230-9673-9b59e7120aa6}"
+#define ACTION_CONTROLLINO_CHECK "@{c27eabf2-20bd-4c24-b0e7-610f604310a9}"
 
 // magnet constants
 #define RELAIS_MAGNET_DOOR CONTROLLINO_R6
 #define RELAIS_MAGNET_COMPARTMENT CONTROLLINO_R7
-
-// sound constants
-#define SND_DOOR_OPEN "T2"
-#define SND_COMPARTMENT_OPEN "T3"
-#define SND_VICTORY "T4"
 
 // required by storm.lib
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
@@ -38,8 +30,7 @@
 int state = STATE_WEIGH_KETTLE;
 
 // debouncing
-unsigned long lastButtonPress = 42; // default value :) 
-unsigned long lastStonePilePress = 42; 
+unsigned long lastButtonPress = 42; // default value :)
 
 void setup() {
   // pinmodes
@@ -55,7 +46,6 @@ void setup() {
 
   // interrupts
   attachInterrupt(digitalPinToInterrupt(BUTTON_INT), buttonIsr, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(STONE_PILE_INT), stonePileIsr, CHANGE); 
 
   // setup needed for common file and scale file
   commonSetup(); 
@@ -72,29 +62,18 @@ void loop() {
 
 void buttonIsr() {
   if (digitalRead(BUTTON_INT) == HIGH) {
-    lastButtonPress = millis(); 
+    lastButtonPress = millis();
   }
   else {
     // if debouncing passes, STATE_VICTORY is reached
-    if (millis() - lastButtonPress > BUTTON_DEBOUNCING_TIME && state == STATE_UNLOCK_COMPARTMENT) nextState();
-  }
-}
- 
-void stonePileIsr() {
-  if (digitalRead(STONE_PILE_INT) == HIGH) {
-    lastStonePilePress = millis(); 
-  }
-  else {
-    // if debouncing passes, STATE_UNLOCK_DOOR is reached
-    if (millis() - lastStonePilePress > STONE_PILE_DEBOUCING_TIME && state == STATE_INIT) nextState();
+    int deltaTime = millis() - lastButtonPress;
+    if (deltaTime > BUTTON_DEBOUNCING_TIME && state == STATE_UNLOCK_COMPARTMENT) nextState();
   }
 }
 
 // implements state diagram
 void nextState() {
   int nextState; // next state to be set
-  if (state == STATE_INIT) nextState = STATE_UNLOCK_DOOR; 
-  if (state == STATE_UNLOCK_DOOR) nextState = STATE_WEIGH_KETTLE; 
   if (state == STATE_WEIGH_KETTLE && !isCorrectWeight()) nextState = STATE_WEIGH_KETTLE; 
   if (state == STATE_WEIGH_KETTLE && isCorrectWeight()) nextState = STATE_UNLOCK_COMPARTMENT; 
   if (state == STATE_UNLOCK_COMPARTMENT) nextState = STATE_VICTORY; 
@@ -107,23 +86,16 @@ void nextState() {
 // performs state actions
 void performState() {
   switch (state) {
-    case STATE_UNLOCK_DOOR:
-    digitalWrite(RELAIS_MAGNET_DOOR, LOW); 
-    makeSound(SND_DOOR_OPEN); 
-    nextState();
-    break; 
-
     case STATE_WEIGH_KETTLE:
     weighKettle(); // will trigger nextState()
     break;
 
     case STATE_UNLOCK_COMPARTMENT:
-    digitalWrite(RELAIS_MAGNET_COMPARTMENT, LOW); 
-    //makeSound(SND_COMPARTMENT_OPEN);
+    digitalWrite(RELAIS_MAGNET_COMPARTMENT, LOW);
     break;
 
     case STATE_VICTORY:
-    setMessageToSend("@Action.victory.ers");
+    setMessageToSend(ACTION_VICTORY);
     performStorm();
     break; 
   }
