@@ -14,7 +14,8 @@
 #define BUTTON_DEBOUNCING_TIME 50 // [milliseconds]
 
 // computer action constants
-#define ACTION_VICTORY "@{7d127e9d-9ce8-47c4-8248-7ba6e19ce0a1}"
+#define ACTION_VICTORY "@{6eefb755-bf7f-46cb-b43b-deb75d65e28f}"
+#define ACTION_CONTROLLINO_CHECK "@{4326b3f3-3d1c-40ec-8804-7a4e8e6a593c}"
 
 // required by storm.lib
 #define RELAIS_STROBOSCOPE CONTROLLINO_R5
@@ -80,7 +81,7 @@ void nextState() {
 void performState() {
   switch (state) {
     case STATE_VICTORY:
-    setMessageToSend("@Action.victory.ers");
+    setMessageToSend(ACTION_VICTORY);
     performStorm();
     break; 
   }
