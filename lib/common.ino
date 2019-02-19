@@ -16,15 +16,6 @@ void commonSetup() {
   Serial2.begin(38400); 
 }
 
-void makeSound(String soundName) {
-  // convert String to char array
-  char charBuf[50];
-  ("@Action.sound-" + soundName + ".ers").toCharArray(charBuf, 50);
-  
-  // send action to pc
-  setMessageToSend(charBuf);
-}
-
 // launch timer until next state
 void launchStateTimer(int seconds) {
   launchStateTimerDs(seconds*10);  

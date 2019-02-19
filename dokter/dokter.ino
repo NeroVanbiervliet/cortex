@@ -12,6 +12,14 @@
 #define STATE_SMOKE 3
 #define STATE_SMOKE_OFF 4
 
+// computer action constants
+#define SND_KEYPRESS "@{e347e304-184b-43bf-a543-0ccb3a3df18f}"
+#define SND_GOODCODE "@{07d3aa47-3bdc-40a9-8211-249a215b2039}"
+#define SND_BADCODE "@{1a97e4ef-75cf-4342-af3e-81a6bb917141}"
+#define SND_ALARM "@{2f53229c-84a1-4154-8faa-9dd57e6d2fa0}"
+#define ACTION_CONTROLLINO_CHECK "@{}" // not used for dokter
+
+
 // keypad constants
 #define KEYPAD_SUPPLY CONTROLLINO_D0
 #define KEYPAD_INT CONTROLLINO_IN0
@@ -89,14 +97,14 @@ void registerLastDigit() {
   keypadCodeAttempt[codeIndex] = lastDigit;
   Serial.println(lastDigit); 
   codeIndex++;
-  makeSound("keyPress");
+  setMessageToSend(SND_KEYPRESS);
   setStatusLight(codeIndex); 
 
   // check code
   if (codeIndex == 4) {
     codeIndex = 0;
-    if (checkKeyPadCode()) { makeSound("goodCode"); nextState(); }
-    else makeSound("badCode"); 
+    if (checkKeyPadCode()) { setMessageToSend(SND_GOODCODE); nextState(); }
+    else setMessageToSend(SND_BADCODE);
   }
 }
 
@@ -170,7 +178,7 @@ void performState() {
     break;
     
     case STATE_PLAY_AUDIO:
-    makeSound("alarm"); 
+    setMessageToSend(SND_ALARM); 
     nextState(); 
     break; 
 
